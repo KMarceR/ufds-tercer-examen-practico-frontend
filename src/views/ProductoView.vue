@@ -8,9 +8,9 @@
                     placeholder="Nombre del producto" v-model="producto.nombre"></v-text-field>
                 <v-text-field label="Precio" maxlength="50" counter color="indigo" clearable
                     placeholder="Precio del producto" v-model="producto.precio"></v-text-field>
-                <v-select color="indigo" label="Marca" :items="marcas" item-value="id" item-title="marca"
+                <v-select color="indigo" label="Marca" :items="marcas" item-value="id" item-title="nombre"
                     v-model="producto.fk_marca"></v-select>
-                    <v-select color="indigo" label="Categoria" :items="categorias" item-value="id" item-title="categoria"
+                <v-select color="indigo" label="Categoria" :items="categorias" item-value="id" item-title="nombre"
                     v-model="producto.fk_categoria"></v-select>
                 <v-btn prepend-icon="mdi-check" color="indigo" block @click="agregarProducto">Agregar</v-btn>
             </v-col>
@@ -33,8 +33,8 @@
                                     <th>{{ producto.id }}</th>
                                     <th>{{ producto.nombre }}</th>
                                     <th>{{ producto.precio }}</th>
-                                    <th>{{ producto.fk_marca }}</th>
-                                    <th>{{ producto.fk_categoria }}</th>
+                                    <th>{{ producto.marca.nombre }}</th>
+                                    <th>{{ producto.categoria.nombre }}</th>
                                     <th>
                                         <v-btn-group>
                                             <v-btn icon="mdi-eye" color="indigo"
@@ -61,8 +61,8 @@
                         <v-list-item prepend-icon="mdi-adjust" :title="producto.id"></v-list-item>
                         <v-list-item prepend-icon="mdi-shape" :title="producto.nombre"></v-list-item>
                         <v-list-item prepend-icon="mdi-shape" :title="producto.precio"></v-list-item>
-                        <v-list-item prepend-icon="mdi-shape" :title="producto.fk_marca"></v-list-item>
-                        <v-list-item prepend-icon="mdi-shape" :title="producto.fk_categoria"></v-list-item>
+                        <v-list-item prepend-icon="mdi-shape" :title="producto.marca.nombre"></v-list-item>
+                        <v-list-item prepend-icon="mdi-shape" :title="producto.categoria.nombre"></v-list-item>
                     </v-list>
                 </v-card-text>
             </v-card>
@@ -73,6 +73,12 @@
                 <v-card-text>
                     <v-text-field label="Nombre" maxlength="50" counter color="indigo" clearable
                         placeholder="Nombre del producto" v-model="producto.nombre"></v-text-field>
+                    <v-text-field label="Precio" maxlength="50" counter color="indigo" clearable
+                        placeholder="Precio del producto" v-model="producto.precio"></v-text-field>
+                    <v-select color="indigo" label="Marca" :items="marcas" item-value="id" item-title="nombre"
+                        v-model="producto.fk_marca"></v-select>
+                    <v-select color="indigo" label="Categoria" :items="categorias" item-value="id" item-title="nombre"
+                        v-model="producto.fk_categoria"></v-select>
                     <v-btn prepend-icon="mdi-check" color="indigo" block
                         @click="modificarProducto(producto.id)">Guardar</v-btn>
                 </v-card-text>
@@ -100,6 +106,13 @@ export default {
             producto: {},
             dialogOne: false,
             dialogTwo: false,
+            marcas: [],
+            caregorias: [],
+            config: {
+                headers: {
+                    'Authorization': 'Bearer ' + this.$store.getters.getToken
+                }
+            }
         }
     },
     methods: {
@@ -118,12 +131,14 @@ export default {
                 .catch(error => console.log('Ha ocurrido un error ' + error))
         },
         obtenerProductos() {
-            this.categorias = []
+            this.productos = []
             axios.get('http://127.0.0.1:8000/api/productos/select', this.config)
                 .then(response => {
                     if (response.data.code == 200) {
                         let res = response.data
-                        this.categorias = res.data
+                        this.productos = res.data
+                        this.marcas = res.marcas
+                        this.categorias = res.categorias
                     }
                 })
                 .catch(error => console.log('Ha ocurrido un error ' + error))
@@ -140,7 +155,7 @@ export default {
                 .then(response => {
                     if (response.data.code == 200) {
                         let res = response.data
-                        this.categoria = res.data
+                        this.producto = res.data
                     }
                 })
                 .catch(error => console.log('Ha ocurrido un error ' + error))
@@ -174,10 +189,9 @@ export default {
                 .catch(error => console.log('Ha ocurrido un error ' + error))
         },
         async getToken() {
-            let token = await this.$storage.get('token')
             this.config = {
                 headers: {
-                    'Authorization': 'Bearer ' + token
+                    'Authorization': 'Bearer ' + this.$store.getters.getToken
                 }
             }
         }

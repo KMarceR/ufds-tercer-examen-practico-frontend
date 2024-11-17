@@ -5,7 +5,7 @@
             <!-- Formulario para agregar cliente -->
             <v-col xs="12" sm="3" md="3" lg="3" xl="3" xxl="3">
                 <v-text-field label="Nombre" maxlength="50" counter color="indigo" clearable
-                    placeholder="Nombre de la categoria" v-model="categoria.nombre_categoria"></v-text-field>
+                    placeholder="Nombre de la categoria" v-model="categoria.nombre"></v-text-field>
                 <v-btn prepend-icon="mdi-check" color="indigo" block @click="agregarCategoria">Agregar</v-btn>
             </v-col>
             <!-- Tabla para mostrar clientes -->
@@ -85,11 +85,16 @@ export default {
             categoria: {},
             dialogOne: false,
             dialogTwo: false,
+            config: {
+                headers: {
+                    'Authorization': 'Bearer ' + this.$store.getters.getToken
+                }
+            }
         }
     },
     methods: {
         agregarCategoria() {
-            axios.post('http://127.0.0.1:8000/api/categorias/store', this.categoria, this.config)
+            axios.post('http://127.0.0.1:8000/api/categorias/store',{nombre:this.categoria.nombre}, this.config)
                 .then(response => {
                     if (response.data.code == 200) {
                         // Cambiar mensaje y visilidad de alerta 
@@ -159,10 +164,9 @@ export default {
                 .catch(error => console.log('Ha ocurrido un error ' + error))
         },
         async getToken() {
-            let token = await this.$storage.get('token')
             this.config = {
                 headers: {
-                    'Authorization': 'Bearer ' + token
+                    'Authorization': 'Bearer ' + this.$store.getters.getToken
                 }
             }
         }

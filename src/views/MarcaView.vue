@@ -26,9 +26,9 @@
                                     <th>
                                         <v-btn-group>
                                             <v-btn icon="mdi-eye" color="indigo"
-                                                @click="obtenerMarcas(marca.id, 1)"></v-btn>
+                                                @click="obtenerMarca(marca.id, 1)"></v-btn>
                                             <v-btn icon="mdi-pencil" color="green"
-                                                @click="obtenerMarcas(marca.id, 2)"></v-btn>
+                                                @click="obtenerMarca(marca.id, 2)"></v-btn>
                                             <v-btn icon="mdi-delete" color="red"
                                                 @click="eliminarMarca(marca.id)"></v-btn>
                                         </v-btn-group>
@@ -108,12 +108,12 @@ export default {
                 .catch(error => console.log('Ha ocurrido un error ' + error))
         },
         obtenerMarcas() {
-            this.marca = []
+            this.marcas = []
             axios.get('http://127.0.0.1:8000/api/marcas/select',this.config)
                 .then(response => {
                     if (response.data.code == 200) {
                         let res = response.data
-                        this.marca = res.data
+                        this.marcas = res.data
                     }
                 })
                 .catch(error => console.log('Ha ocurrido un error ' + error))
@@ -145,7 +145,7 @@ export default {
                         // Ocultar cuadro de diálogo 
                         this.dialogTwo = false
                         // Recargar tabla 
-                        this.obtenerMarca()
+                        this.obtenerMarcas()
                     }
                 })
                 .catch(error => console.log('Ha ocurrido un error ' + error))
@@ -158,7 +158,7 @@ export default {
                         this.alertaEstado = true
                         this.mensaje = response.data.data
                         // Recargar tabla 
-                        this.obtenerMarca()
+                        this.obtenerMarcas()
                     }
                 })
                 .catch(error => console.log('Ha ocurrido un error ' + error))
